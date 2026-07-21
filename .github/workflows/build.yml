@@ -1,0 +1,63 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: 'stable'
+
+      - name: Fill project scaffolding
+        run: flutter create . --org com.biblia.sagrada --project-name biblia_sagrada
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK (release)
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: biblia-sagrada-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "Bíblia Sagrada Evangélica v1.0.0"
+          body: |
+            ## Bíblia Sagrada Evangélica Completa v1.0.0
+
+            ### Funcionalidades
+            - 66 livros (AT/NT) com SQLite offline
+            - 4 versões: ARC, ARA, NVI, NTLH
+            - Leitor bíblico com modo noturno e ajuste de fonte
+            - Busca avançada por palavra-chave, frase exata e temas
+            - 8 temas teológicos predefinidos
+            - Dicionário Strong (Hebraico/Grego)
+            - Esboços de pregação com editor integrado
+            - Favoritos, anotações e histórico de leitura
+            - Design Material 3 (tema claro/escuro)
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

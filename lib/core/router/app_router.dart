@@ -20,8 +20,8 @@ class AppRouter {
   static const String history = '/history';
   static const String notes = '/notes';
 
-  static Route<dynamic> generateRoute(RouteSettings settings) {
-    switch (settings.name) {
+  static Route<dynamic> generateRoute(RouteSettings routeSettings) {
+    switch (routeSettings.name) {
       case reader:
         return MaterialPageRoute(builder: (_) => const ReaderPage());
       case search:
@@ -42,7 +42,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => Scaffold(
             body: Center(
-              child: Text('Rota não encontrada: ${settings.name}'),
+              child: Text('Rota não encontrada: ${routeSettings.name}'),
             ),
           ),
         );
